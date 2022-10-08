@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">iRoom</string>
+    <string name="textbox_hint">iRoom</string>
+    <string name="back">Back</string>
+    <string name="conversation">Conversation</string>
+    <string name="switch_vc">Switch to Video Call</string>
+    <string name="exit">Exit</string>
+    <string name="other_lyt_txt">iRoom</string>
+    <string name="name">Name</string>
+    <string name="roomCode">Room Code</string>
+    <string name="join">Join</string>
+    <string name="createRoom">Create Room</string>
+    <string name="loading">Loading</string>
+    <string name="end_room">End Room</string>
+    <string name="sign_in">Sign in with Google</string>
+    <string name="condition"><![CDATA[By signing in, you agree to receive marketing & promotional emails from our side.]]></string>
+    <string name="power_off">Power Off</string>
+</resources>

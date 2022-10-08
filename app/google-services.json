@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "125969034370",
+    "project_id": "iroom-android-app",
+    "storage_bucket": "iroom-android-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:125969034370:android:48f08b393572b411cf189b",
+        "android_client_info": {
+          "package_name": "com.tts.deepaksoni.iroom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "125969034370-5kqaesh7385glnocelenlmkioncr1haq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tts.deepaksoni.iroom",
+            "certificate_hash": "626e21fc72fac872d6cc5a964df57152af595c86"
+          }
+        },
+        {
+          "client_id": "125969034370-i2oacqm2orpl53l7crhi85nrho89agh9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tts.deepaksoni.iroom",
+            "certificate_hash": "092ee46a52265e25cd66996459ee324557eb648b"
+          }
+        },
+        {
+          "client_id": "125969034370-k5bbcllidv6ismg78aj22b3ea9aj0f52.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0FMYFx1zr1vDJ0bTiZhqx-R5_cJ9GI90"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "125969034370-k5bbcllidv6ismg78aj22b3ea9aj0f52.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
