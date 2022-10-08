@@ -2,6 +2,7 @@ package com.tts.deepaksoni.iroom;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -89,9 +90,16 @@ public class LoginActivity extends AppCompatActivity {
                                     if (task.isSuccessful())
                                     {
                                         FirebaseUser user = task.getResult().getUser();
+                                        String photoUri = "";
+
                                         if (user != null)
                                         {
-                                            PostLogin(user.getDisplayName());
+                                            if (user.getPhotoUrl() != null)
+                                            {
+                                                photoUri = user.getPhotoUrl().toString();
+                                            }
+
+                                            PostLogin(user.getDisplayName(), photoUri);
                                         }
                                         else
                                         {
@@ -112,7 +120,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void PostLogin(String displayNameGiven)
+    private void PostLogin(String displayNameGiven, String pictureUri)
     {
         // Fetch Data
         String displayName = displayNameGiven;
@@ -125,10 +133,11 @@ public class LoginActivity extends AppCompatActivity {
             displayName = displayName.trim();
         }
 
-        // Save Name
+        // Save Name & Picture
         SharedPreferences sharedPreferences = getSharedPreferences("Data", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("DisplayName", displayName);
+        editor.putString("DisplayPicture", pictureUri);
         editor.apply();
 
         // Logout

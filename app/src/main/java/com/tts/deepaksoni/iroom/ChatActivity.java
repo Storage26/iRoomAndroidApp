@@ -1,6 +1,7 @@
 package com.tts.deepaksoni.iroom;
 
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -8,6 +9,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,6 +35,7 @@ public class ChatActivity extends AppCompatActivity {
     ArrayList<Integer> type;
     ArrayList<String> text;
     ArrayList<String> sn;
+    ArrayList<String> pic;
 
     LinearLayout typing_lyt;
     ImageView typing_img;
@@ -99,6 +102,7 @@ public class ChatActivity extends AppCompatActivity {
         type = new ArrayList<>();
         text = new ArrayList<>();
         sn = new ArrayList<>();
+        pic = new ArrayList<>();
         listView = findViewById(R.id.listView);
         sendButton = findViewById(R.id.send_btn);
         input = findViewById(R.id.input);
@@ -117,7 +121,7 @@ public class ChatActivity extends AppCompatActivity {
         blinking_anim.setRepeatCount(Animation.INFINITE);
         typing_img.startAnimation(blinking_anim);
 
-        back.setOnClickListener(v -> finish());
+        back.setOnClickListener(v -> CloseRoom());
         String dhh = "Room - " + code;
         roomLabel.setText(dhh);
 
@@ -158,10 +162,16 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         // Socket Connection
-        SocketConnect();
+        SocketConnect(RetrievePicture());
 
         // Loop
         StartLoop();
+    }
+
+    private String RetrievePicture()
+    {
+        SharedPreferences sharedPreferences = getSharedPreferences("Data", MODE_PRIVATE);
+        return sharedPreferences.getString("DisplayPicture", "");
     }
 
     private void ToggleTyping(boolean toggle)
@@ -211,6 +221,11 @@ public class ChatActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
+        CloseRoom();
+    }
+
+    private void CloseRoom()
+    {
         if (socket != null)
         {
             handler.removeCallbacks(runnable);
@@ -222,7 +237,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void AdapterDefine()
     {
-        adapter = new AdapterA(this, type, text, sn);
+        adapter = new AdapterA(this, type, text, sn, pic);
         listView.setAdapter(adapter);
     }
 
@@ -237,6 +252,7 @@ public class ChatActivity extends AppCompatActivity {
             type.add(1);
             text.add(s.trim());
             sn.add("");
+            pic.add("");
 
             adapter.notifyDataSetChanged();
             listView.setSelection(adapter.getCount() - 1);
@@ -248,22 +264,35 @@ public class ChatActivity extends AppCompatActivity {
         type.add(2);
         text.add(s.trim());
         sn.add("");
+        pic.add("");
 
         adapter.notifyDataSetChanged();
         listView.setSelection(adapter.getCount() - 1);
     }
 
-    private void Receive(String s, String sender_name)
+    private void EndedMessage(String s)
+    {
+        type.add(10);
+        text.add(s.trim());
+        sn.add("");
+        pic.add("");
+
+        adapter.notifyDataSetChanged();
+        listView.setSelection(adapter.getCount() - 1);
+    }
+
+    private void Receive(String s, String sender_name, String picture)
     {
         type.add(0);
         text.add(s.trim());
         sn.add(sender_name);
+        pic.add(picture);
 
         adapter.notifyDataSetChanged();
         listView.setSelection(adapter.getCount() - 1);
     }
 
-    private void SocketConnect()
+    private void SocketConnect(String photo)
     {
         dialog.show();
 
@@ -271,8 +300,8 @@ public class ChatActivity extends AppCompatActivity {
         {
             IO.Options options = new IO.Options();
             options.reconnection = false;
-            options.query = "user_name=" + username + "&room_id=" + code;
-            socket = IO.socket("https://voila-meetup.herokuapp.com/active_room", options);
+            options.query = "user_name=" + username + "&room_id=" + code + "&pic=" + photo;
+            socket = IO.socket("https://iroom-site.herokuapp.com/active_room", options);
         }
         catch (URISyntaxException e)
         {
@@ -297,8 +326,15 @@ public class ChatActivity extends AppCompatActivity {
         socket.on("room_ended", args -> runOnUiThread(() -> {
             String _name = Arrays.toString(args).substring(1);
             String name = _name.substring(0, _name.length() - 1);
-            ServerMessage("Room ended by " + name);
+            View view = this.getCurrentFocus();
+            if (view != null)
+            {
+                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
             msgBox.setVisibility(View.GONE);
+            EndedMessage("Room ended by " + name);
+            endRoom.setEnabled(false);
         }));
         socket.on("user_left", args -> runOnUiThread(() -> {
             String _name = Arrays.toString(args).substring(1);
@@ -318,11 +354,12 @@ public class ChatActivity extends AppCompatActivity {
                 JSONObject sender = jsonObject.getJSONObject("sender");
                 String sender_id = sender.getString("id");
                 String sender_name = sender.getString("name");
+                String picture = sender.getString("pic");
                 String message = jsonObject.getString("message");
 
                 if (socket != null && !sender_id.equals(socket.id()))
                 {
-                    Receive(message, sender_name);
+                    Receive(message, sender_name, picture);
                 }
             }
             catch (JSONException e) {/**/}

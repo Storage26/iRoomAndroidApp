@@ -89,7 +89,7 @@ public class HomeActivity extends AppCompatActivity {
                     if (!room_code.isEmpty())
                     {
                         // ACTUAL REQUEST
-                        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://voila-meetup.herokuapp.com/room-status?id=" + room_code, null, response -> {
+                        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://iroom-site.herokuapp.com/room-status?id=" + room_code, null, response -> {
                             try
                             {
                                 if (response.has("success"))
@@ -187,7 +187,7 @@ public class HomeActivity extends AppCompatActivity {
                 if (!username.isEmpty())
                 {
                     // ACTUAL REQUEST
-                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://voila-meetup.herokuapp.com/create-room?name=" + username, null, response -> {
+                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://iroom-site.herokuapp.com/create-room?name=" + username, null, response -> {
                         try
                         {
                             if (response.has("success"))
@@ -273,7 +273,7 @@ public class HomeActivity extends AppCompatActivity {
     {
         AsyncTask.execute(() -> {
             RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://voila-meetup.herokuapp.com/i", null, null, null);
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://iroom-site.herokuapp.com/i", null, null, null);
             requestQueue.add(request);
         });
     }
@@ -283,6 +283,7 @@ public class HomeActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("Data", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove("DisplayName");
+        editor.remove("DisplayPicture");
         editor.apply();
 
         Intent intent = new Intent(this, LoginActivity.class);

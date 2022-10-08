@@ -15,4 +15,5 @@
     <string name="sign_in">Sign in with Google</string>
     <string name="condition"><![CDATA[By signing in, you agree to receive marketing & promotional emails from our side.]]></string>
     <string name="power_off">Power Off</string>
+    <string name="profile">Profile</string>
 </resources>

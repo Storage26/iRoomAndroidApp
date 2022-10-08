@@ -16,6 +16,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/other_lyt"/>
 
+    <TextView
+        android:visibility="gone"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:textColor="#727272"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ended_lyt"/>
+
     <LinearLayout
         android:visibility="gone"
         android:id="@+id/sent_lyt"
@@ -60,6 +70,7 @@
             android:layout_marginEnd="10dp">
 
             <ImageView
+                android:id="@+id/sender_img_msg_rec"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@null"
