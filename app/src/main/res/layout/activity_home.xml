@@ -127,10 +127,10 @@
             android:elevation="0dp"
             app:cardCornerRadius="999dp">
 
-<!--            todo continue-->
             <ImageView
+                android:scaleType="fitCenter"
                 android:id="@+id/profile_pic_home"
-                android:layout_width="43dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@null"
                 android:src="@drawable/user"

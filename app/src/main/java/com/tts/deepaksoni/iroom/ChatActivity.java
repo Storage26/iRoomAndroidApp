@@ -2,6 +2,7 @@ package com.tts.deepaksoni.iroom;
 
 import android.app.Dialog;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -149,9 +150,11 @@ public class ChatActivity extends AppCompatActivity {
             if (socket != null)
             {
                 socket.emit("end_room");
+                endRoom.setEnabled(false);
             }
         });
         sendButton.setOnClickListener(view -> {
+            PlaySound("send");
             String msg = input.getText().toString().trim();
 
             if (!msg.isEmpty())
@@ -166,6 +169,15 @@ public class ChatActivity extends AppCompatActivity {
 
         // Loop
         StartLoop();
+    }
+
+    private void PlaySound(String sound)
+    {
+        if (sound.equals("send"))
+        {
+            MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.send_button_click);
+            mediaPlayer.start();
+        }
     }
 
     private String RetrievePicture()

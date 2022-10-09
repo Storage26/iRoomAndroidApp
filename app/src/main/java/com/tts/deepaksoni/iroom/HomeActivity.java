@@ -16,6 +16,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONException;
@@ -24,6 +25,8 @@ public class HomeActivity extends AppCompatActivity {
 
     TextView joinButton;
     TextView createButton;
+
+    ImageView profilePicture;
 
     FirebaseAuth firebaseAuth;
 
@@ -58,6 +61,10 @@ public class HomeActivity extends AppCompatActivity {
         username_input = findViewById(R.id.username_input);
         room_code_input = findViewById(R.id.room_code_input);
         logoutButton = findViewById(R.id.logout_btn);
+        profilePicture = findViewById(R.id.profile_pic_home);
+
+        // Load Profile Picture
+        LoadProfilePicture();
 
         // Load Default
         SharedPreferences sharedPreferences = getSharedPreferences("Data", MODE_PRIVATE);
@@ -81,123 +88,35 @@ public class HomeActivity extends AppCompatActivity {
                 taskRunning = true;
                 dialog.show();
 
-                String username = username_input.getText().toString().trim();
+                SharedPreferences sharedPreferences1 = getSharedPreferences("Data", MODE_PRIVATE);
+                String username = sharedPreferences1.getString("DisplayName", "").trim();
+                if (username.isEmpty())
+                {
+                    username = "Human Being";
+                }
                 String room_code = room_code_input.getText().toString().trim();
 
-                if (!username.isEmpty())
-                {
-                    if (!room_code.isEmpty())
-                    {
-                        // ACTUAL REQUEST
-                        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://iroom-site.herokuapp.com/room-status?id=" + room_code, null, response -> {
-                            try
-                            {
-                                if (response.has("success"))
-                                {
-                                    if (response.getBoolean("success"))
-                                    {
-                                        if (response.has("roomActive"))
-                                        {
-                                            if (response.getBoolean("roomActive"))
-                                            {
-                                                JoinRoom(username, room_code);
-                                            }
-                                            else
-                                            {
-                                                Toast.makeText(this, "No such room", Toast.LENGTH_SHORT).show();
-                                            }
-
-                                            dialog.hide();
-                                            taskRunning = false;
-                                        }
-                                        else
-                                        {
-                                            Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show();
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        if (response.has("error"))
-                                        {
-                                            String error = response.getString("error");
-                                            Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
-                                        }
-                                        else
-                                        {
-                                            Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show();
-                                        }
-
-                                    }
-                                    dialog.hide();
-                                    taskRunning = false;
-                                }
-                                else
-                                {
-                                    dialog.hide();
-                                    Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show();
-                                }
-
-                                dialog.hide();
-                                taskRunning = false;
-                            }
-                            catch (JSONException e)
-                            {
-                                e.printStackTrace();
-                                dialog.hide();
-                                taskRunning = false;
-                                Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show();
-                            }
-                        }, error -> {
-                            Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show();
-                            dialog.hide();
-                            taskRunning = false;
-                        });
-
-                        queue.add(request);
-                    }
-                    else
-                    {
-                        room_code_input.setError("Room Code is required");
-                        room_code_input.requestFocus();
-
-                        dialog.hide();
-                        taskRunning = false;
-                    }
-                }
-                else
-                {
-                    username_input.setError("Username is required");
-                    username_input.requestFocus();
-
-                    dialog.hide();
-                    taskRunning = false;
-                }
-            }
-        });
-
-        createButton.setOnClickListener(v -> {
-            if (!taskRunning)
-            {
-                taskRunning = true;
-                dialog.show();
-
-                String username = username_input.getText().toString().trim();
-
-                if (!username.isEmpty())
+                if (!room_code.isEmpty())
                 {
                     // ACTUAL REQUEST
-                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://iroom-site.herokuapp.com/create-room?name=" + username, null, response -> {
+                    String finalUsername = username;
+                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://iroom-site.herokuapp.com/room-status?id=" + room_code, null, response -> {
                         try
                         {
                             if (response.has("success"))
                             {
                                 if (response.getBoolean("success"))
                                 {
-                                    if (response.has("roomCode"))
+                                    if (response.has("roomActive"))
                                     {
-                                        String grc = response.getString("roomCode");
-                                        JoinRoom(username, grc);
+                                        if (response.getBoolean("roomActive"))
+                                        {
+                                            JoinRoom(finalUsername, room_code);
+                                        }
+                                        else
+                                        {
+                                            Toast.makeText(this, "No such room", Toast.LENGTH_SHORT).show();
+                                        }
 
                                         dialog.hide();
                                         taskRunning = false;
@@ -227,7 +146,6 @@ public class HomeActivity extends AppCompatActivity {
                             else
                             {
                                 dialog.hide();
-                                taskRunning = false;
                                 Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show();
                             }
 
@@ -251,14 +169,103 @@ public class HomeActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    username_input.setError("Username is required");
-                    username_input.requestFocus();
+                    room_code_input.setError("Room Code is required");
+                    room_code_input.requestFocus();
 
                     dialog.hide();
                     taskRunning = false;
                 }
             }
         });
+
+        createButton.setOnClickListener(v -> {
+            if (!taskRunning)
+            {
+                taskRunning = true;
+                dialog.show();
+
+                SharedPreferences sharedPreferences1 = getSharedPreferences("Data", MODE_PRIVATE);
+                String username = sharedPreferences1.getString("DisplayName", "").trim();
+                if (username.isEmpty())
+                {
+                    username = "Human Being";
+                }
+
+                // ACTUAL REQUEST
+                String finalUsername = username;
+                JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "https://iroom-site.herokuapp.com/create-room?name=" + username, null, response -> {
+                    try
+                    {
+                        if (response.has("success"))
+                        {
+                            if (response.getBoolean("success"))
+                            {
+                                if (response.has("roomCode"))
+                                {
+                                    String grc = response.getString("roomCode");
+                                    JoinRoom(finalUsername, grc);
+
+                                    dialog.hide();
+                                    taskRunning = false;
+                                }
+                                else
+                                {
+                                    Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                            else
+                            {
+                                if (response.has("error"))
+                                {
+                                    String error = response.getString("error");
+                                    Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                            dialog.hide();
+                            taskRunning = false;
+                        }
+                        else
+                        {
+                            dialog.hide();
+                            taskRunning = false;
+                            Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show();
+                        }
+
+                        dialog.hide();
+                        taskRunning = false;
+                    }
+                    catch (JSONException e)
+                    {
+                        e.printStackTrace();
+                        dialog.hide();
+                        taskRunning = false;
+                        Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show();
+                    }
+                }, error -> {
+                    Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show();
+                    dialog.hide();
+                    taskRunning = false;
+                });
+
+                queue.add(request);
+            }
+        });
+    }
+
+    private void LoadProfilePicture()
+    {
+        SharedPreferences sharedPreferences = getSharedPreferences("Data", MODE_PRIVATE);
+        String profile_picture = sharedPreferences.getString("DisplayPicture", "");
+        if (!profile_picture.isEmpty())
+        {
+            Glide.with(this).load(profile_picture).placeholder(R.drawable.user).into(profilePicture);
+        }
     }
 
     private void JoinRoom(String username, String code)
